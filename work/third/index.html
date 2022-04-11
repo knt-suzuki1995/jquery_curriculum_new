@@ -37,9 +37,9 @@
     // .addClass() クラスを追加します。
     // .removeClass() クラスを削除します。
     $('.nav li').on('click', function () {
-      indexNum = $(this).index()
-      $('.contents li').hide()
-      $('.contents li').eq(indexNum).show()
+      indexNum = $(this).index();
+      $('.contents li').addClass('is-hidden');
+      $('.contents li').eq(indexNum).removeClass('is-hidden');
     });
   </script>
 </body>
