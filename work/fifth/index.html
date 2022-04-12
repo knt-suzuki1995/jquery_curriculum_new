@@ -109,9 +109,9 @@
       } else {
         $('.list').children('li').hide();
         $('.list').children('li').each(function (index, val) {
-          var categoryType = $(this).data('category-type');
+          var categoryType = $(val).data('category-type');
           if (categoryType === selectedVal) {
-            $(this).show()
+            $(val).show()
           }
         });
 
