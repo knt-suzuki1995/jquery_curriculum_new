@@ -58,15 +58,24 @@
     // .slideUp() 要素がスライドしながら非表示されます。
     // .children() 要素の子要素を取得します。
     // .stop() 現在動作中のアニメーション処理を全て中止します。
+    $(function () {
+      $('.menu__list').children().hover(
+        function () {
+          slide_down_menu(this);
+        },
+        function () {
+          slide_up_menu(this);
+        }
+      );
 
-    $('.menu__list').children('li').hover(
-      function () {
-        $(this).children('ul').stop().slideDown();
-      },
-      function () {
-        $(this).children('ul').stop().slideUp();
+      function slide_down_menu(x) {
+        $(x).children('ul').stop().slideDown();
       }
-    );
+
+      function slide_up_menu(x) {
+        $(x).children('ul').stop().slideUp();
+      }
+    });
   </script>
 </body>
 

@@ -30,16 +30,17 @@
   </div>
   <script src="../../common/js/jquery.js"></script>
   <script>
-    // 今回やるのはタブメニューです。
-    // navの小要素であるliをクリックして、contents内の小要素であるli要素を表示させる。
-    // .index() 要素のindexを取得します。
-    // .eq() 引数に応じたindexの要素を指定します。
-    // .addClass() クラスを追加します。
-    // .removeClass() クラスを削除します。
-    $('.nav li').on('click', function () {
-      indexNum = $(this).index();
-      $('.contents li').addClass('is-hidden');
-      $('.contents li').eq(indexNum).removeClass('is-hidden');
+    $(function () {
+      // 今回やるのはタブメニューです。
+      // navの小要素であるliをクリックして、contents内の小要素であるli要素を表示させる。
+      // .index() 要素のindexを取得します。
+      // .eq() 引数に応じたindexの要素を指定します。
+      // .addClass() クラスを追加します。
+      // .removeClass() クラスを削除します。
+      $('.nav > li').children().on('click', function () {
+        indexNum = $(this).index();
+        $('.contents').children().addClass('is-hidden').eq(indexNum).removeClass('is-hidden');
+      });
     });
   </script>
 </body>
