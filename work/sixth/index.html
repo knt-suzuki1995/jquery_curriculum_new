@@ -1,167 +1,180 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <title>jQuery</title>
+    <link rel="stylesheet" href="../../common/css/reset.css" />
+    <link rel="stylesheet" href="../../common/css/base.css" />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="format-detection" content="telephone=no">
-  <title>jQuery</title>
-  <link rel="stylesheet" href="../../common/css/reset.css">
-  <link rel="stylesheet" href="../../common/css/base.css">
-  <link rel="stylesheet" href="./css/style.css">
-</head>
-
-<body>
-  <div class="wrap">
-    <div class="container">
-      <div class="header">
-        <p class="header__title">Search Books!</p>
-      </div>
-      <div class="search">
-        <div class="search__text">
-          <input type="text" class="search__text__input" placeholder="検索する" data-js="search-word">
+  <body>
+    <div class="wrap">
+      <div class="container">
+        <div class="header">
+          <p class="header__title">Search Books!</p>
         </div>
-        <button class="search__btn" data-js="search-btn">検索する</button>
+        <div class="search">
+          <div class="search__text">
+            <input
+              type="text"
+              class="search__text__input"
+              placeholder="検索する"
+              data-js="search-word"
+            />
+          </div>
+          <button class="search__btn" data-js="search-btn">検索する</button>
+        </div>
+        <div class="message" data-js="error-message"></div>
+        <ul class="lists" data-js="book-lists"></ul>
       </div>
-      <div class="message" data-js="error-message"></div>
-      <ul class="lists" data-js="book-lists"></ul>
     </div>
-  </div>
-  <script src="../../common/js/jquery.js"></script>
-  <script src="./js/appid.js"></script>
-  <script>
-    // 楽天ブックスの総合検索APIを使って製作してください。
-    // answerの挙動を良く見てね！
-    //
-    // 下記URLにAPIの仕様が載っているので、ブラウザで開いて参考にしてください。
-    // https://webservice.rakuten.co.jp/documentation/books-total-search
-    //
-    //
-    // [使うメソッド]
-    // e.preventDefault イベントをキャンセルするためのメソッド。今回はaタグの遷移を無効化します。
-    // on('click') onメソッドを使うことで、動的に出力される要素に対してもイベント登録が行えます。
-    // $.each(配列, function functionName() {}) 配列に対しての繰り返し処理が行えます。
-    // $.ajax({}) 外部ファイルやURLに対してデータをリクエストすることができます。
-    // 以下は今回使う$.ajaxの基本的な形です。
-    //
-    // $.ajax({
-    //   url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
-    //   type: 'GET',
-    //   datatype: 'json',
-    //   data: {
-    //     // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内に入れましょう。
-    //     applicationId: appId, (今回はこの変数をIDとして使用します) ※メンターから別途渡されるファイルを読み込んでください。
-    //     booksGenreId: '001'
-    //   },
-    // }).done(function(data) {
-    //   // この中にデータ取得後の動きを記述していきます。
-    //   console.log(data);
-    // });
-    //
-    //
-    // $.ajaxによってデータが取得できたら、必要なデータ(作品名とか作者名とか)を取得します。
-    // 取得できたらHTMLに<ul class='lists'></ul>を用意しているので、下のテンプレに沿ってデータを入れ込みましょう。
-    // <li class="lists__item">
-    //  <div class="lists__item__inner">
-    //    <a class="lists__item__link" target="_blank">
-    //      <img src="" class="lists__item__img" alt="">
-    //      <p class="lists__item__detail">作品名：</p>
-    //      <p class="lists__item__detail">作者　：</p>
-    //      <p class="lists__item__detail">出版社：</p>
-    //    </a>
-    //  </div>
-    // </li>
-    //
-    // 取得できた書籍の件数をもとに、ページャを作成しましょう
-    // ページャの条件
-    // ├ 「現在のページ数」と「全てのページ数」が表示されている
-    // ├ 「前へ」と「次へ」のボタンがある
-    // ├ 1ページ目では「前へ」に、最後のページでは「次へ」にdisabledクラスをつけて非活性（使用不能）にする
-    // └ 1ページしかない場合はどちらもdisabledクラスをつけて非活性にする
-    //
-    // ページャのテンプレート
-    // <div class="pager" data-js="pager">
-    //   <div class="counter">
-    //     <span class="counter-current"></span>/<span class="counter-all"></span>
-    //   </div>
-    //   <div class="btn-wrapper">
-    //     <a class="btn-item" data-js="page-prev">前へ</a>
-    //     <a class="btn-item" data-js="page-next">次へ</a>
-    //   </div>
-    // </div>
-    $(function () {
+    <script src="../../common/js/jquery.js"></script>
+    <script src="./js/appid.js"></script>
+    <script>
+      // 楽天ブックスの総合検索APIを使って製作してください。
+      // answerの挙動を良く見てね！
+      //
+      // 下記URLにAPIの仕様が載っているので、ブラウザで開いて参考にしてください。
+      // https://webservice.rakuten.co.jp/documentation/books-total-search
+      //
+      //
+      // [使うメソッド]
+      // e.preventDefault イベントをキャンセルするためのメソッド。今回はaタグの遷移を無効化します。
+      // on('click') onメソッドを使うことで、動的に出力される要素に対してもイベント登録が行えます。
+      // $.each(配列, function functionName() {}) 配列に対しての繰り返し処理が行えます。
+      // $.ajax({}) 外部ファイルやURLに対してデータをリクエストすることができます。
+      // 以下は今回使う$.ajaxの基本的な形です。
+      //
+      // $.ajax({
+      //   url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
+      //   type: 'GET',
+      //   datatype: 'json',
+      //   data: {
+      //     // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内に入れましょう。
+      //     applicationId: appId, (今回はこの変数をIDとして使用します) ※メンターから別途渡されるファイルを読み込んでください。
+      //     booksGenreId: '001'
+      //   },
+      // }).done(function(data) {
+      //   // この中にデータ取得後の動きを記述していきます。
+      //   console.log(data);
+      // });
+      //
+      //
+      // $.ajaxによってデータが取得できたら、必要なデータ(作品名とか作者名とか)を取得します。
+      // 取得できたらHTMLに<ul class='lists'></ul>を用意しているので、下のテンプレに沿ってデータを入れ込みましょう。
+      // <li class="lists__item">
+      //  <div class="lists__item__inner">
+      //    <a class="lists__item__link" target="_blank">
+      //      <img src="" class="lists__item__img" alt="">
+      //      <p class="lists__item__detail">作品名：</p>
+      //      <p class="lists__item__detail">作者　：</p>
+      //      <p class="lists__item__detail">出版社：</p>
+      //    </a>
+      //  </div>
+      // </li>
+      //
+      // 取得できた書籍の件数をもとに、ページャを作成しましょう
+      // ページャの条件
+      // ├ 「現在のページ数」と「全てのページ数」が表示されている
+      // ├ 「前へ」と「次へ」のボタンがある
+      // ├ 1ページ目では「前へ」に、最後のページでは「次へ」にdisabledクラスをつけて非活性（使用不能）にする
+      // └ 1ページしかない場合はどちらもdisabledクラスをつけて非活性にする
+      //
+      // ページャのテンプレート
+      // <div class="pager" data-js="pager">
+      //   <div class="counter">
+      //     <span class="counter-current"></span>/<span class="counter-all"></span>
+      //   </div>
+      //   <div class="btn-wrapper">
+      //     <a class="btn-item" data-js="page-prev">前へ</a>
+      //     <a class="btn-item" data-js="page-next">次へ</a>
+      //   </div>
+      // </div>
+      $(function () {
+        var pageNum = 0;
+        var searchWord = "";
+        var click_button = "";
 
-      var pageNum = 0;
-      var searchWord = "";
-
-      $('.search__btn').on('click', function () {
-        pageNum = 1;
-        searchWord = $('.search__text__input').val();
-        show_content();
-      });
-
-      $(document).on('click', '.btn-item', function () {
-        if ($(this).hasClass('disabled')) {
-          return;
-        }
-        var data_type = $(this).data('js');
-        if (data_type === 'page-next') {
-          pageNum = pageNum + 1;
-        }
-        if (data_type === 'page-prev') {
-          pageNum = pageNum - 1;
-        }
-        show_content();
-      });
-
-      function show_content() {
-        remove_pager_btn()
-        empty_content();
-        ajax_action();
-      };
-
-      function empty_content() {
-        $('.message').empty();
-        $('.lists').empty();
-      }
-
-      function remove_pager_btn() {
-        $('.pager').remove();
-      }
-
-      function ajax_action() {
-        $.ajax({
-          url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
-          type: 'GET',
-          datatype: 'json',
-          data: {
-            // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内に入れましょう。
-            keyword: searchWord,
-            applicationId: appId,
-            booksGenreId: '001',
-            page: pageNum,
-            hits: 20
-          },
-        }).done(function (data) {
-          // この中にデータ取得後の動きを記述していきます。
-          console.log(data);
-          ajax_done_action(data);
-          //通信に失敗した場合
-        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
-          ajax_fail_action(XMLHttpRequest.status);
+        $(".search__btn").on("click", function () {
+          pageNum = 1;
+          searchWord = $(".search__text__input").val();
+          show_content();
         });
-      };
 
-      function ajax_done_action(data) {
-        //検索結果が０件の場合
-        if (data.hits === 0) {
-          $('.message').html('<p>検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>');
-          return;
+        $(document).on("click", ".btn-item", function () {
+          if ($(this).hasClass("disabled")) {
+            return;
+          }
+          var data_type = $(this).data("js");
+          if (data_type === "page-next") {
+            pageNum = pageNum + 1;
+            click_button = "page-next";
+          }
+          if (data_type === "page-prev") {
+            pageNum = pageNum - 1;
+            click_button = "page-prev";
+          }
+          show_content();
+        });
+
+        function show_content() {
+          remove_pager_btn();
+          empty_content();
+          ajax_action();
         }
 
-        if (data.count > 0) {
-          $.each(data.Items, function (i, item) {
-            var temp = `
+        function empty_content() {
+          $(".message").empty();
+          $(".lists").empty();
+        }
+
+        function remove_pager_btn() {
+          $(".pager").remove();
+        }
+
+        function ajax_action() {
+          $.ajax({
+            url: "https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522",
+            type: "GET",
+            datatype: "json",
+            data: {
+              // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内に入れましょう。
+              keyword: searchWord,
+              applicationId: appId,
+              booksGenreId: "001",
+              page: pageNum,
+              hits: 20,
+            },
+          })
+            .done(function (data) {
+              // この中にデータ取得後の動きを記述していきます。
+              console.log(data);
+              ajax_done_action(data);
+              //通信に失敗した場合
+            })
+            .fail(function (XMLHttpRequest, textStatus, errorThrown) {
+              ajax_fail_action(XMLHttpRequest.status);
+            });
+        }
+
+        function ajax_done_action(data) {
+          //検索結果が０件の場合
+          if (data.hits === 0) {
+            $(".message").html(
+              "<p>検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>"
+            );
+            return;
+          }
+
+          if (data.count > 0) {
+            $.each(data.Items, function (i, item) {
+              var temp = `
                 <li class="lists__item">
                   <div class="lists__item__inner">
                     <a href="${item.Item.itemUrl}" class="lists__item__link" target="_blank">
@@ -173,11 +186,11 @@
                   </div>
                 </li>
             `;
-            $('.lists').append(temp);
-          })
-        }
+              $(".lists").append(temp);
+            });
+          }
 
-        var pager_temp = `
+          var pager_temp = `
             <div class="pager" data-js="pager">
               <div class="counter">
                 <span class="counter-current">${data.page}</span>/<span class="counter-all">${data.pageCount}</span>
@@ -188,37 +201,47 @@
               </div>
             </div>
         `;
-        $('.lists').after(pager_temp);
+          $(".lists").after(pager_temp);
 
-        if (pageNum === 1) {
-          $('[data-js="page-prev"]').addClass('disabled');
-          if (data.pageCount === 1) {
-            $('[data-js="page-next"]').addClass('disabled');
+          if (click_button === "page-next") {
+            $(".counter-current").text(pageNum);
+            $('[data-js="page-prev"]').removeClass("disabled");
+          } else {
+            $(".counter-current").text(pageNum);
+            $('[data-js="page-next"]').removeClass("disabled");
           }
-        } else {
-          $('.counter-current').text(pageNum);
-          $('[data-js="page-prev"]').removeClass('disabled');
+
+          if (pageNum === 1) {
+            $('[data-js="page-prev"]').addClass("disabled");
+          }
+
+          if (pageNum === data.pageCount) {
+            $('[data-js="page-next"]').addClass("disabled");
+          }
+
+          click_button = "";
         }
-      };
 
-      function ajax_fail_action(status) {
-        switch (status) {
-          case 400:
-            $('.message').html('<p>検索文字が入力されていません。</p>');
-            break;
-          case 429:
-            $('.message').html('<p>リクエスト過多です。しばらく時間を置いてからお試しください。</p>');
-            break;
-          case 0:
-            $('.message').html('<p>データ通信できませんでした<br>接続を確認してください。</p>');
-            break;
-          default:
-            $('.message').html('<p>予期せぬエラー</p>');
+        function ajax_fail_action(status) {
+          switch (status) {
+            case 400:
+              $(".message").html("<p>検索文字が入力されていません。</p>");
+              break;
+            case 429:
+              $(".message").html(
+                "<p>リクエスト過多です。しばらく時間を置いてからお試しください。</p>"
+              );
+              break;
+            case 0:
+              $(".message").html(
+                "<p>データ通信できませんでした<br>接続を確認してください。</p>"
+              );
+              break;
+            default:
+              $(".message").html("<p>予期せぬエラー</p>");
+          }
         }
-      };
-
-    });
-  </script>
-</body>
-
+      });
+    </script>
+  </body>
 </html>
