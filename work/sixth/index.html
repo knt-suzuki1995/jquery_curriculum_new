@@ -99,10 +99,12 @@
       $(function () {
         var pageNum = 0;
         var searchWord = "";
-        var click_button = "";
+        var hitsCount = 20;
+        var zeroSearchResults = 0;
+        var topPage = 1;
 
         $(".search__btn").on("click", function () {
-          pageNum = 1;
+          pageNum = topPage;
           searchWord = $(".search__text__input").val();
           show_content();
         });
@@ -113,12 +115,10 @@
           }
           var data_type = $(this).data("js");
           if (data_type === "page-next") {
-            pageNum = pageNum + 1;
-            click_button = "page-next";
+            pageNum++;
           }
           if (data_type === "page-prev") {
-            pageNum = pageNum - 1;
-            click_button = "page-prev";
+            pageNum--;
           }
           show_content();
         });
@@ -126,7 +126,7 @@
         function show_content() {
           remove_pager_btn();
           empty_content();
-          ajax_action();
+          book_action();
         }
 
         function empty_content() {
@@ -138,106 +138,115 @@
           $(".pager").remove();
         }
 
-        function ajax_action() {
+        function book_action() {
           $.ajax({
             url: "https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522",
             type: "GET",
             datatype: "json",
             data: {
-              // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内に入れましょう。
               keyword: searchWord,
               applicationId: appId,
               booksGenreId: "001",
               page: pageNum,
-              hits: 20,
+              hits: hitsCount,
             },
           })
             .done(function (data) {
-              // この中にデータ取得後の動きを記述していきます。
               console.log(data);
-              ajax_done_action(data);
-              //通信に失敗した場合
+              book_done_action(data);
             })
             .fail(function (XMLHttpRequest, textStatus, errorThrown) {
-              ajax_fail_action(XMLHttpRequest.status);
+              book_fail_action(XMLHttpRequest.status);
             });
         }
 
-        function ajax_done_action(data) {
+        function book_done_action(book) {
           //検索結果が０件の場合
-          if (data.hits === 0) {
+          if (book.count === zeroSearchResults) {
             $(".message").html(
               "<p>検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>"
             );
             return;
           }
 
-          if (data.count > 0) {
-            $.each(data.Items, function (i, item) {
-              var temp = `
-                <li class="lists__item">
-                  <div class="lists__item__inner">
-                    <a href="${item.Item.itemUrl}" class="lists__item__link" target="_blank">
-                      <img src="${item.Item.mediumImageUrl}" class="lists__item__img" alt="${item.Item.title}">
-                      <p class="lists__item__detail">作品名：${item.Item.title}</p>
-                      <p class="lists__item__detail">作者　：${item.Item.author}</p>
-                      <p class="lists__item__detail">出版社：${item.Item.publisherName}</p>
-                    </a>
-                  </div>
-                </li>
-            `;
-              $(".lists").append(temp);
-            });
-          }
+          book_show_action(book);
+          pager_action(book);
+        }
 
-          var pager_temp = `
-            <div class="pager" data-js="pager">
-              <div class="counter">
-                <span class="counter-current">${data.page}</span>/<span class="counter-all">${data.pageCount}</span>
-              </div>
-              <div class="btn-wrapper">
-                <a class="btn-item" data-js="page-prev">前へ</a>
-                <a class="btn-item" data-js="page-next">次へ</a>
-              </div>
-            </div>
-        `;
+        function book_show_action(book) {
+          var temp = "";
+          $.each(book.Items, function (i, bookItem) {
+            temp +=
+              '<li class="lists__item">' +
+              '<div class="lists__item__inner">' +
+              '<a href="' +
+              bookItem.Item.itemUrl +
+              '" class="lists__item__link" target="_blank">' +
+              '<img src="' +
+              bookItem.Item.mediumImageUrl +
+              '" class="lists__item__img" alt="' +
+              bookItem.Item.title +
+              '">' +
+              '<p class="lists__item__detail">作品名：' +
+              bookItem.Item.title +
+              "</p>" +
+              '<p class="lists__item__detail">作者　：' +
+              bookItem.Item.author +
+              "</p>" +
+              '<p class="lists__item__detail">出版社：' +
+              bookItem.Item.publisherName +
+              "</p>" +
+              "</a>" +
+              "</div>" +
+              "</li>";
+          });
+          $(".lists").append(temp);
+        }
+
+        function pager_action(book) {
+          var pager_temp =
+            '<div class="pager" data-js="pager">' +
+            '<div class="counter">' +
+            '<span class="counter-current">' +
+            book.page +
+            '</span>/<span class="counter-all">' +
+            book.pageCount +
+            "</span>" +
+            "</div>" +
+            '<div class="btn-wrapper">' +
+            '<a class="btn-item" data-js="page-prev">前へ</a>' +
+            '<a class="btn-item" data-js="page-next">次へ</a>' +
+            "</div>" +
+            "</div>";
           $(".lists").after(pager_temp);
-
-          if (click_button === "page-next") {
-            $('[data-js="page-prev"]').removeClass("disabled");
-          } else {
-            $('[data-js="page-next"]').removeClass("disabled");
-          }
 
           if (pageNum === 1) {
             $('[data-js="page-prev"]').addClass("disabled");
           }
 
-          if (pageNum === data.pageCount) {
+          if (pageNum === book.pageCount) {
             $('[data-js="page-next"]').addClass("disabled");
           }
-
-          click_button = "";
         }
 
-        function ajax_fail_action(status) {
+        function book_fail_action(status) {
+          errorMessage = "";
           switch (status) {
             case 400:
-              $(".message").html("<p>検索文字が入力されていません。</p>");
+              errorMessage = "<p>検索文字が入力されていません。</p>";
               break;
             case 429:
-              $(".message").html(
-                "<p>リクエスト過多です。しばらく時間を置いてからお試しください。</p>"
-              );
+              errorMessage =
+                "<p>リクエスト過多です。しばらく時間を置いてからお試しください。</p>";
               break;
             case 0:
-              $(".message").html(
-                "<p>データ通信できませんでした<br>接続を確認してください。</p>"
-              );
+              errorMessage =
+                "<p>データ通信できませんでした<br>接続を確認してください。</p>";
               break;
             default:
-              $(".message").html("<p>予期せぬエラー</p>");
+              errorMessage = "<p>予期せぬエラー</p>";
           }
+          $(".message").html(errorMessage);
         }
       });
     </script>
