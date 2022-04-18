@@ -96,28 +96,29 @@
       //     <a class="btn-item" data-js="page-next">次へ</a>
       //   </div>
       // </div>
+
       $(function () {
         var pageNum = 0;
-        var searchWord = "";
+        var searchWord = '';
         var hitsCount = 20;
         var zeroSearchResults = 0;
         var topPage = 1;
 
-        $(".search__btn").on("click", function () {
+        $('[data-js="search-btn"]').on('click', function () {
           pageNum = topPage;
-          searchWord = $(".search__text__input").val();
+          searchWord = $('[data-js="search-word"]').val();
           show_content();
         });
 
-        $(document).on("click", ".btn-item", function () {
+        $(document).on('click', '.btn-item', function () {
           if ($(this).hasClass("disabled")) {
             return;
           }
-          var data_type = $(this).data("js");
-          if (data_type === "page-next") {
+          var data_type = $(this).data('js');
+          if (data_type === 'page-next') {
             pageNum++;
           }
-          if (data_type === "page-prev") {
+          if (data_type === 'page-prev') {
             pageNum--;
           }
           show_content();
@@ -130,23 +131,23 @@
         }
 
         function empty_content() {
-          $(".message").empty();
-          $(".lists").empty();
+          $('[data-js="error-message"]').empty();
+          $('[data-js="book-lists"]').empty();
         }
 
         function remove_pager_btn() {
-          $(".pager").remove();
+          $('.pager').remove();
         }
 
         function book_action() {
           $.ajax({
-            url: "https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522",
-            type: "GET",
-            datatype: "json",
+            url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
+            type: 'GET',
+            datatype: 'json',
             data: {
               keyword: searchWord,
               applicationId: appId,
-              booksGenreId: "001",
+              booksGenreId: '001',
               page: pageNum,
               hits: hitsCount,
             },
@@ -163,18 +164,17 @@
         function book_done_action(book) {
           //検索結果が０件の場合
           if (book.count === zeroSearchResults) {
-            $(".message").html(
-              "<p>検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>"
+            $('[data-js="error-message"]').html(
+              '<p>検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>'
             );
             return;
           }
-
           book_show_action(book);
           pager_action(book);
         }
 
         function book_show_action(book) {
-          var temp = "";
+          var temp = '';
           $.each(book.Items, function (i, bookItem) {
             temp +=
               '<li class="lists__item">' +
@@ -189,18 +189,18 @@
               '">' +
               '<p class="lists__item__detail">作品名：' +
               bookItem.Item.title +
-              "</p>" +
+              '</p>' +
               '<p class="lists__item__detail">作者　：' +
               bookItem.Item.author +
-              "</p>" +
+              '</p>' +
               '<p class="lists__item__detail">出版社：' +
               bookItem.Item.publisherName +
-              "</p>" +
-              "</a>" +
-              "</div>" +
-              "</li>";
+              '</p>' +
+              '</a>' +
+              '</div>' +
+              '</li>';
           });
-          $(".lists").append(temp);
+          $('[data-js="book-lists"]').append(temp);
         }
 
         function pager_action(book) {
@@ -211,42 +211,42 @@
             book.page +
             '</span>/<span class="counter-all">' +
             book.pageCount +
-            "</span>" +
-            "</div>" +
+            '</span>' +
+            '</div>' +
             '<div class="btn-wrapper">' +
             '<a class="btn-item" data-js="page-prev">前へ</a>' +
             '<a class="btn-item" data-js="page-next">次へ</a>' +
-            "</div>" +
-            "</div>";
-          $(".lists").after(pager_temp);
+            '</div>' +
+            '</div>';
+          $('[data-js="book-lists"]').after(pager_temp);
 
           if (pageNum === 1) {
-            $('[data-js="page-prev"]').addClass("disabled");
+            $('[data-js="page-prev"]').addClass('disabled');
           }
 
           if (pageNum === book.pageCount) {
-            $('[data-js="page-next"]').addClass("disabled");
+            $('[data-js="page-next"]').addClass('disabled');
           }
         }
 
         function book_fail_action(status) {
-          errorMessage = "";
+          var errorMessage = '';
           switch (status) {
             case 400:
-              errorMessage = "<p>検索文字が入力されていません。</p>";
+              errorMessage = '<p>検索文字が入力されていません。</p>';
               break;
             case 429:
               errorMessage =
-                "<p>リクエスト過多です。しばらく時間を置いてからお試しください。</p>";
+                '<p>リクエスト過多です。しばらく時間を置いてからお試しください。</p>';
               break;
             case 0:
               errorMessage =
-                "<p>データ通信できませんでした<br>接続を確認してください。</p>";
+                '<p>データ通信できませんでした<br>接続を確認してください。</p>';
               break;
             default:
-              errorMessage = "<p>予期せぬエラー</p>";
+              errorMessage = '<p>予期せぬエラー</p>';
           }
-          $(".message").html(errorMessage);
+          $('[data-js="error-message"]').html(errorMessage);
         }
       });
     </script>
