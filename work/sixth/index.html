@@ -204,10 +204,8 @@
           $(".lists").after(pager_temp);
 
           if (click_button === "page-next") {
-            $(".counter-current").text(pageNum);
             $('[data-js="page-prev"]').removeClass("disabled");
           } else {
-            $(".counter-current").text(pageNum);
             $('[data-js="page-next"]').removeClass("disabled");
           }
 
